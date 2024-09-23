@@ -1,0 +1,61 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+
+public class TextToImageConverter {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(TextToImageConverter::createAndShowGUI);
+    }
+
+    private static void createAndShowGUI() {
+        JFrame frame = new JFrame("Text to Image Converter");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+
+        JTextField textField = new JTextField("Enter your text here");
+        JButton convertButton = new JButton("Convert to Image");
+        JLabel messageLabel = new JLabel(" ", SwingConstants.CENTER);
+
+        convertButton.addActionListener(e -> {
+            String text = textField.getText();
+            BufferedImage image = createImageFromText(text);
+            try {
+                File outputfile = new File("text_image.png");
+                ImageIO.write(image, "png", outputfile);
+                messageLabel.setText("Image saved as text_image.png");
+            } catch (Exception ex) {
+                messageLabel.setText("Error saving image: " + ex.getMessage());
+            }
+        });
+
+        frame.setLayout(new BorderLayout());
+        frame.add(textField, BorderLayout.NORTH);
+        frame.add(convertButton, BorderLayout.CENTER);
+        frame.add(messageLabel, BorderLayout.SOUTH);
+        frame.setVisible(true);
+    }
+
+    private static BufferedImage createImageFromText(String text) {
+        Font font = new Font("Arial", Font.PLAIN, 24);
+        FontMetrics metrics = new Canvas().getFontMetrics(font);
+        int width = metrics.stringWidth(text) + 20;
+        int height = metrics.getHeight() + 20;
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = image.createGraphics();
+
+        // Set background color
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, width, height);
+
+        // Set font color
+        g2d.setColor(Color.BLACK);
+        g2d.setFont(font);
+        g2d.drawString(text, 10, metrics.getAscent() + 10);
+        g2d.dispose();
+
+        return image;
+    }
+}
